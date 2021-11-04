@@ -20,7 +20,12 @@ jobs:
         uses: cycjimmy/semantic-release-action@v2
         with:
           extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/changelog
             @semantic-release/exec
+            @semantic-release/git
+            @semantic-release/github
       - name: Docker Login
         run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GH_TOKEN}
       - name: Docker Tag Release
