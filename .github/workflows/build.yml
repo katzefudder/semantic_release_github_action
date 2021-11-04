@@ -1,0 +1,33 @@
+name: Release
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  Build:
+    runs-on: ubuntu-20.04
+    env:
+      REGISTRY: docker.pkg.github.com
+      IMAGE: semantic-release
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v1
+      - name: Docker Build
+        run: docker build . --tag localbuild/image:latest
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          extra_plugins: |
+            @semantic-release/exec
+      - name: Docker Login
+        run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GITHUB_TOKEN}
+      - name: Docker Tag Release
+        run: docker tag localbuild/image:latest $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:v${{ steps.semantic.outputs.new_release_version }}
+      - name: Docker Push Release
+        run: docker push $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:v${{ steps.semantic.outputs.new_release_version }}
+      - name: Docker Tag Latest
+        run: docker tag localbuild/image:latest $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest
+      - name: Docker Push Latest
+        run: docker push $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:latest
