@@ -28,7 +28,7 @@ jobs:
             @semantic-release/git
             @semantic-release/github
       - name: Docker Login
-        run: echo ${GH_TOKEN} | docker login ghcr.io -u USERNAME --password-stdin
+        run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GITHUB_TOKEN}
       - name: Docker Tag Release
         run: docker tag localbuild/image:latest $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:v${{ steps.semantic.outputs.new_release_version }}
       - name: Docker Push Release
