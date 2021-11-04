@@ -7,7 +7,7 @@ jobs:
   Build:
     runs-on: ubuntu-20.04
     env:
-      REGISTRY: docker.pkg.github.com
+      REGISTRY: ghcr.io
       IMAGE: semantic-release
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
@@ -28,7 +28,7 @@ jobs:
             @semantic-release/git
             @semantic-release/github
       - name: Docker Login
-        run: docker login $REGISTRY -u ${GITHUB_ACTOR} -p ${GH_TOKEN}
+        run: echo ${GH_TOKEN} | docker login ghcr.io -u USERNAME --password-stdin
       - name: Docker Tag Release
         run: docker tag localbuild/image:latest $REGISTRY/$GITHUB_REPOSITORY/$IMAGE:v${{ steps.semantic.outputs.new_release_version }}
       - name: Docker Push Release
